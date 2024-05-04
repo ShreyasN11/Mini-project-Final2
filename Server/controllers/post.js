@@ -17,9 +17,8 @@ const findpatient = async (req, res) => {
 }
 
 async function getuser(Pid){
-    const res1 = await pool.query(`SELECT * FROM usertable JOIN hospitalisationdata ON usertable.Pid= hospitalisationdata.Pid WHERE usertable.Pid = ?`, [Pid]);
-    const res2 = await pool.query(`SELECT * FROM userdata JOIN hospitalisationdata ON userdata.Pid= hospitalisationdata.Pid WHERE userdata.Pid = ?`, [Pid]);
-    return [res1, res2];
+    const res = await pool.query(`SELECT * FROM userdata JOIN hospitalisationdata ON userdata.Pid= hospitalisationdata.Pid WHERE userdata.Pid = ?`, [Pid]);
+    return res;
 }
 
 const finduser = async (req, res) => { 
@@ -28,9 +27,8 @@ const finduser = async (req, res) => {
         const aadharNumber = req.body.aadharNumber;
         const patient = await getuser(aadharNumber);
         //console.log(patient[1][0][0]); 
-        const patientdata = patient[0][0][0];
-        const patientdata2 = patient[1][0][0]
-        res.json([patientdata, patientdata2]); 
+        const patientdata = patient[0][0];
+        res.json(patientdata); 
     } catch (error) {
         console.error('Error searching for patient:', error);
         res.status(500).json({ error: 'An unexpected error occurred' });
@@ -38,7 +36,7 @@ const finduser = async (req, res) => {
 }
 
 async function getrole(email){
-    const res = await pool.query(`SELECT role FROM roles WHERE emailID = ? `, String(email) ); //!COMPLETE QUERY
+    const res = await pool.query(`SELECT Pid FROM roles WHERE emailID = ? `, String(email) ); //!COMPLETE QUERY
     return res;
 }
 
@@ -52,10 +50,35 @@ const checkrole = async (req, res) => {
         res.status(500).json({ error: 'An unexpected error occurred' });
     }
 }
+const updateprefs = async (req, res) => {
+    try {
+        const aadharNumber = req.body.aadharNumber;
+        const DateofBirth = req.body.DateofBirth;
+        const Gender = req.body.Gender;
+        const BloodGroup = req.body.BloodGroup;
+        const Hospital = req.body.Hospital;
+        //console.log("Aadhar Number is "+aadharNumber);
+        const sql = `
+            UPDATE userdata 
+            SET AgeFlag = ?, GenderFlag = ?, BloodGroupFlag = ?, Hospitalflag = ? 
+            WHERE Pid = ?
+        `;
+        const values = [DateofBirth, Gender, BloodGroup, Hospital, aadharNumber];
+        const result = await pool.query(sql, values);
+        //console.log(Query)
+        //console.log(result);
+        res.status(200).send("Preferences updated successfully");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
 
 
 module.exports = {
     findpatient,
     checkrole,
-    finduser
+    finduser,
+    updateprefs
   };

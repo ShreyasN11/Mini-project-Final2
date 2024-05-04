@@ -57,19 +57,51 @@ const SearchPatient = ()=> {
             if (value !== null && value !== undefined) {
                 // Create a new paragraph element for each property
                 const paragraph = document.createElement('div');
-                console.log(key);
+                //console.log(key);
                 paragraph.setAttribute('id', 'final');
                 if(key=='Pid')
                 {
-                    ReactDOM.render(<HiIdentification />, paragraph);
-                    paragraph.textContent = `${key}: ${value}`;
+                    const Heading = document.createElement('h3');
+                    Heading.textContent = "Personal Details: ";
+                    const part1 = document.createElement('div');
+                    const part2 = document.createElement('div');
+                    ReactDOM.render(<HiIdentification pid={value} />, part1);
+                    part2.textContent = ` : ${value}`;
+                    paragraph.appendChild(part1);
+                    paragraph.appendChild(part2);
+                    resultContainer.appendChild(Heading);
                     resultContainer.appendChild(paragraph);
                 }
-                else{
-                    // Set the text content of the paragraph to the property name and value
+                else if(key=='BillingAmount' || key == 'AgeFlag' || key == 'BloodGroupFlag' || key == 'GenderFlag'){
+                
+                }
+                else if(key == 'Hospitalflag'){
+                    if(value == false) {
+                        //console.log(value + "Logged here");
+                        break; 
+                    }    
+                }
+                else if(key=='Hospital'){
+                    const Heading = document.createElement('h3');
                     paragraph.textContent = `${key}: ${value}`;
-                    // Append the paragraph to the result container
+                    Heading.textContent = "Hospitalisation Details: ";
+                    resultContainer.appendChild(Heading);
                     resultContainer.appendChild(paragraph);
+
+                }
+                else{
+                    if(key == 'DateOfBirth' && !backendData.AgeFlag){}
+                    else if(key == 'BloodGroup' && !backendData.BloodGroupFlag){}
+                    else if(key == 'Gender' && !backendData.GenderFlag){}
+                    else if(key == 'DateOfBirth'){
+                        let text = value.toString();
+                        paragraph.textContent = `${key}: ${text.substring(0, 9)}`;
+                        resultContainer.appendChild(paragraph);
+                    }                        
+                    else{
+                        paragraph.textContent = `${key}: ${value}`;
+                        resultContainer.appendChild(paragraph);
+                    }
                 }
                 
             }

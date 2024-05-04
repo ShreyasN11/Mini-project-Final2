@@ -19,7 +19,7 @@ const LoginForm = ()=> {
                 if (username === 'smnaik1109@gmail.com') {
                     Navigate('/admin');
                   } else {
-                    Navigate('/user');
+                    Navigate(`/user?email=${username}`);
                   }               
             })
             .catch(error => {
